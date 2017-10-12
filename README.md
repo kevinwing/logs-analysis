@@ -3,7 +3,7 @@ Logs analysis project for Udacity
 
 ### Views
 
-CREATE VIEW top_three AS
+```CREATE VIEW top_three AS
     SELECT articles.title, count(articles.slug) AS views
         FROM articles, log
         WHERE log.path LIKE concat ('%', articles.slug)
@@ -24,3 +24,4 @@ CREATE VIEW high_errors AS
         GROUP BY day
         HAVING (sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0) >= 1.0
         ORDER BY percent_errors DESC;
+```
