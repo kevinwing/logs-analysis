@@ -31,10 +31,16 @@ CREATE VIEW high_errors AS
 
 import psycopg2
 
-DBNAME = 'news'
+DBNAME = 'news'  # Set name of postgreSQL database to connect to
 
 
 def run_query(query, db_name=DBNAME):
+    """Return the results of a SQL SELECT query.
+
+    keyword args:
+    query string -- Any SQL statement starting with SELECT (required)
+    db_name string -- Specify the name of the postgreSQL database to be used (default=DBNAME)
+    """
     db = psycopg2.connect(database=db_name)
     cursor = db.cursor()
     cursor.execute(query)
@@ -44,6 +50,13 @@ def run_query(query, db_name=DBNAME):
 
 
 def display_rows(content, message, is_ratio=True):
+    """Return content formatted for display to terminal.
+
+    keyword args:
+    content list -- A list of tuples obtained from a SQL query
+    message string -- A string used as the title of the formatted output
+    is_ratio boolean -- A boolean used to determine if '%' or 'Views' should be added to end of line
+    """
     display_content = message + ":\n\n"
 
     for row in content:
@@ -56,6 +69,7 @@ def display_rows(content, message, is_ratio=True):
 
 
 def main():
+    """Execute queries and displays results to terminal."""
     print(chr(27) + "[2J")
     print("Gathering Data...")
     stories = run_query("SELECT * FROM top_three")
@@ -68,4 +82,3 @@ def main():
 
 
 main()
-# test_query()
