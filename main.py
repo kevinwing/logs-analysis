@@ -20,7 +20,9 @@ CREATE VIEW ranked_authors AS
         ORDER BY views DESC;
 
 CREATE VIEW high_errors AS
-    SELECT to_char(time::date, 'YYYY-MM-DD') AS day, round((sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0), 2) AS percent_errors
+    SELECT to_char(time::date, 'YYYY-MM-DD') AS day,
+            round((sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0), 2)
+            AS percent_errors
         FROM log
         GROUP BY day
         HAVING (sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0) >= 1.0
@@ -28,7 +30,6 @@ CREATE VIEW high_errors AS
 """
 
 import psycopg2
-# from datetime import datetime
 
 DBNAME = 'news'
 
@@ -40,18 +41,6 @@ def run_query(query, db_name=DBNAME):
     results = cursor.fetchall()
     db.close()
     return results
-
-
-def top_three_articles():
-    return run_query("SELECT * FROM top_three")
-
-
-def ranked_authors():
-    return run_query("SELECT * FROM ranked_authors")
-
-
-def errors_by_day():
-    return run_query("SELECT * FROM high_errors")
 
 
 def display_rows(content, message, is_ratio=True):
@@ -69,9 +58,9 @@ def display_rows(content, message, is_ratio=True):
 def main():
     print(chr(27) + "[2J")
     print("Gathering Data...")
-    stories = top_three_articles()
-    authors = ranked_authors()
-    errors = errors_by_day()
+    stories = run_query("SELECT * FROM top_three")
+    authors = run_query("SELECT * FROM ranked_authors")
+    errors = run_query("SELECT * FROM high_errors")
     print(chr(27) + "[2J")
     print(display_rows(stories, "Top Three Articles by Views", False))
     print(display_rows(authors, "Authors ranked by Views", False))
