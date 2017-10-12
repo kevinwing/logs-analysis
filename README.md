@@ -5,17 +5,22 @@ Logs analysis project for Udacity
 
 This code makes use of three custom functions.
 
-  ```python
-  run_query(), display_rows()
-  ```
-  and 
-  ```
-  main()
-  ```
-
 ```python
 run_query()
 ```
+This function takes in a string which must be a proper SQL SELECT statement and returns a result set from the database.
+
+```python
+display_rows()
+```
+This function is a somewhat generic function for taking the results of `run_query()` and formatting for display. Returns
+formatted results as a string.
+
+```python
+main()
+```
+The `main()` function is the primary function called to run the program. It initializes the different database queries and
+then wraps them in some formatting for human readability.
 
 ### Views
 
