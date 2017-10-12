@@ -24,7 +24,7 @@ then wraps them in some formatting for human readability.
 
 ### Views
 
-Run each of these three statements in the postgreSQL terminal
+Run each of these three statements in the postgreSQL terminal in order for programm to function correctly. Alternatively you could alter the `run_query()` calls and insert the portion starting with `SELECT` as the `query` argument.
 
 #### Top Three Articles
 ```sql
