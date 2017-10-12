@@ -3,7 +3,8 @@ Logs analysis project for Udacity
 
 ### Views
 
-```CREATE VIEW top_three AS
+```
+CREATE VIEW top_three AS
     SELECT articles.title, count(articles.slug) AS views
         FROM articles, log
         WHERE log.path LIKE concat ('%', articles.slug)
