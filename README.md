@@ -27,6 +27,7 @@ then wraps them in some formatting for human readability.
 Run each of these three statements in the postgreSQL terminal in order for programm to function correctly. Alternatively you could alter the `run_query()` calls and insert the portion starting with `SELECT` as the `query` argument.
 
 #### Top Three Articles
+Creates VIEW to retrieve the top three most popular articles.
 ```sql
 CREATE VIEW top_three AS
     SELECT articles.title, count(articles.slug) AS views
@@ -38,6 +39,7 @@ CREATE VIEW top_three AS
 ```
 
 #### Authors Ranked by Views
+Creates VIEW to rank the authors based of number of views of all articles.
 ```sql
 CREATE VIEW ranked_authors AS
     SELECT authors.name, count(authors.name) AS views
@@ -48,6 +50,7 @@ CREATE VIEW ranked_authors AS
 ```
 
 #### Days with errors above 1%
+Creates VIEW to find percentage of errors over 1% for any day.
 ```sql
 CREATE VIEW high_errors AS
     SELECT to_char(time::date, 'YYYY-MM-DD') AS day,
