@@ -16,17 +16,20 @@ CREATE VIEW top_three AS
 CREATE VIEW ranked_authors AS
     SELECT authors.name, count(authors.name) AS views
         FROM authors, articles, log
-        WHERE log.path LIKE concat ('%', articles.slug) AND articles.author = authors.id
+        WHERE log.path LIKE concat ('%', articles.slug)
+            AND articles.author = authors.id
         GROUP BY authors.name
         ORDER BY views DESC;
 
 CREATE VIEW high_errors AS
     SELECT to_char(time::date, 'YYYY-MM-DD') AS day,
-            round((sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0), 2)
+            round((sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) /
+                (count(*) * 1.0) * 100.0), 2)
             AS percent_errors
         FROM log
         GROUP BY day
-        HAVING (sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0) >= 1.0
+        HAVING (sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) /
+            (count(*) * 1.0) * 100.0) >= 1.0
         ORDER BY percent_errors DESC;
 """
 
@@ -40,7 +43,8 @@ def run_query(query, db_name=DBNAME):
 
     keyword args:
     query string -- Any SQL statement starting with SELECT (required)
-    db_name string -- Specify the name of the postgreSQL database to be used (default=DBNAME)
+    db_name string -- Specify the name of the postgreSQL database to
+    be used (default=DBNAME)
     """
     db = psycopg2.connect(database=db_name)
     cursor = db.cursor()
@@ -56,7 +60,8 @@ def display_rows(content, message, is_ratio=True):
     keyword args:
     content list -- A list of tuples obtained from a SQL query
     message string -- A string used as the title of the formatted output
-    is_ratio boolean -- A boolean used to determine if '%' or 'Views' should be added to end of line
+    is_ratio boolean -- A boolean used to determine if '%' or 'Views'
+    should be added to end of line
     """
     display_content = message + ":\n\n"
 
