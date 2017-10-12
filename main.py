@@ -12,15 +12,23 @@ CREATE VIEW top_three AS
         ORDER BY views DESC
         LIMIT 3;
 
-CREATE VIEW top_authors AS
+CREATE VIEW ranked_authors AS
     SELECT authors.name, count(authors.name) AS views
         FROM authors, articles, log
         WHERE log.path LIKE concat ('%', articles.slug) AND articles.author = authors.id
         GROUP BY authors.name
         ORDER BY views DESC;
+
+CREATE VIEW high_errors AS
+    SELECT to_char(time::date, 'YYYY-MM-DD') AS day, round((sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0), 2) AS percent_errors
+        FROM log
+        GROUP BY day
+        HAVING (sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0) >= 1.0
+        ORDER BY percent_errors DESC;
 """
 
 import psycopg2
+# from datetime import datetime
 
 DBNAME = 'news'
 
@@ -34,68 +42,40 @@ def run_query(query, db_name=DBNAME):
     return results
 
 
-def top_three():
+def top_three_articles():
     return run_query("SELECT * FROM top_three")
-    # db = psycopg2.connect(database=DBNAME)
-    # cursor = db.cursor()
-    # cursor.execute("SELECT * FROM top_three")
-    # results = cursor.fetchall()
-    # db.close()
-    # return results
 
 
-def top_authors():
-    return run_query('select * from top_authors')
+def ranked_authors():
+    return run_query("SELECT * FROM ranked_authors")
 
 
-def top_errors():
-    return run_query("""
-        SELECT to_char(time::date, 'YYYY-MM-DD') AS day, round((sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0), 2) AS percent_errors
-        FROM log
-        GROUP BY day
-        HAVING (sum(CASE WHEN status NOT LIKE '%200%' THEN 1 ELSE 0 END) / (count(*) * 1.0) * 100.0) >= 1.0
-        ORDER BY percent_errors DESC;
-        """)
+def errors_by_day():
+    return run_query("SELECT * FROM high_errors")
 
 
-def test_query(content):
-    display_content = ""
-    for row in content:
-        display_content += "{0:<48} | {1:<48}\n".format(*row)
-    return display_content
-
-
-def display_rows(content, column_1_name, column_2_name):
-    display_content = "{:_<98}\n".format(" ")
-    display_content += "|{0:^48}|{1:^48}|\n".format(
-        column_1_name, column_2_name)
-    display_content += "|{:-^48}|{:-^48}|\n".format("", "")
+def display_rows(content, message, is_ratio=True):
+    display_content = message + ":\n\n"
 
     for row in content:
-        display_content += "|{:^48}|{:^48}|\n".format("", "")
-        display_content += "|{0:^48}|{1:^48}|\n".format(*row)
-
-    display_content += "|{:_<48}|{:_<48}|\n".format("", "")
+        if is_ratio:
+            display_content += (" " * 4) + "{0} - {1}%\n".format(*row)
+        else:
+            display_content += (" " * 4) + "{0} - {1} Views\n".format(*row)
 
     return display_content
 
 
 def main():
-    print "Preparing for launch...\n"
-    stories = top_three()
-    print "Firing up the engines...\n"
-    authors = top_authors()
-    print "3, 2, 1..."
-    errors = top_errors()
-    print "{:^98}".format("Top Three")
-    print display_rows(stories, "Articles", "Views")
-    print "{:^98}".format("Top Authors")
-    print display_rows(authors, "Author", "Views")
-    print "{:^98}".format("Day with highest Error count")
-    # print errors
-    print display_rows(errors, "Day", "Errors")
-    # errors = top_errors()
-    # print test_query(errors)
+    print(chr(27) + "[2J")
+    print("Gathering Data...")
+    stories = top_three_articles()
+    authors = ranked_authors()
+    errors = errors_by_day()
+    print(chr(27) + "[2J")
+    print(display_rows(stories, "Top Three Articles by Views", False))
+    print(display_rows(authors, "Authors ranked by Views", False))
+    print(display_rows(errors, "Days with errors above 1%"))
 
 
 main()
