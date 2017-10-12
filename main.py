@@ -3,7 +3,8 @@
 # Created: 10/8/2017
 # Modified: 10/8/2017
 
-"""
+"""Execute these statements in postgreSQL for code to work properly.
+
 CREATE VIEW top_three AS
     SELECT articles.title, count(articles.slug) AS views
         FROM articles, log
