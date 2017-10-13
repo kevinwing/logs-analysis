@@ -46,12 +46,16 @@ def run_query(query, db_name=DBNAME):
     db_name string -- Specify the name of the postgreSQL database to
     be used (default=DBNAME)
     """
-    db = psycopg2.connect(database=db_name)
-    cursor = db.cursor()
-    cursor.execute(query)
-    results = cursor.fetchall()
-    db.close()
-    return results
+    try:
+        db = psycopg2.connect(database=db_name)
+        cursor = db.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+        db.close()
+        return results
+    except Exception as e:
+        print(e)
+        exit(1)
 
 
 def display_rows(content, message, is_ratio=True):
